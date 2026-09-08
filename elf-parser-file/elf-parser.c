@@ -7,6 +7,7 @@
 int main(int argc, char *argv[]) {
     // 1. 파일 열기
     FILE *fp;
+    int found;
     int symtable_entry_num;
     fp = fopen(argv[1],"rb");
 if(fp==NULL)
@@ -14,7 +15,6 @@ if(fp==NULL)
 printf("failed to open file\n");
 return 1;
 }	
-
 
     // 2. ELF Header 읽기 (Elf64_Ehdr)
     Elf64_Ehdr ehdr;
@@ -87,7 +87,7 @@ return 1;
 
     printf("========Symbols========\n");
 
-   
+   found=0;
 	     //( symboltable & strtab read printf)and( symbol name & address)
      for(int i=0; i<ehdr.e_shnum;i++)
         {
@@ -104,10 +104,12 @@ return 1;
             fread(strtab,sizeof(char),shdr[shdr[i].sh_link].sh_size,fp);//fread char* strtab size
            for(int j=0; j<symtable_entry_num;j++)
 	    printf("%s 0x%lx\n",&strtab[sym[j].st_name],sym[j].st_value);//printf
-								       
+	   found = 1;							       
          }
         }
-
+	
+	if(found==0)
+	printf("stripped\n");
 
 
 }
