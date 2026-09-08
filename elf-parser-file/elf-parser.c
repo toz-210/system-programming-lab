@@ -7,6 +7,7 @@
 int main(int argc, char *argv[]) {
     // 1. 파일 열기
     FILE *fp;
+    int symtable_entry_num;
     fp = fopen(argv[1],"rb");
 if(fp==NULL)
 {
@@ -42,16 +43,18 @@ return 1;
     fseek(fp,ehdr.e_shoff, SEEK_SET);
     Elf64_Shdr shdr[ehdr.e_shnum];
     fread(shdr, sizeof(Elf64_Shdr), ehdr.e_shnum, fp);
-    
     fseek(fp,shdr[ehdr.e_shstrndx].sh_offset,SEEK_SET);
     char *shstrtab=malloc(shdr[ehdr.e_shstrndx].sh_size);
     fread(shstrtab, sizeof(char),shdr[ehdr.e_shstrndx].sh_size,fp);
+
+   
+
     // 6. 출력
     printf("========ELF Header=========\n");
 
     printf("e_type: %d\n",ehdr.e_type);
     printf("e_entry: 0x%lx\n", ehdr.e_entry);
-    printf("e_phnum: %d\n", ehdr.e_phnum);
+   printf("e_phnum: %d\n", ehdr.e_phnum);
     printf("e_shnum: %d\n", ehdr.e_shnum);
 
 
@@ -62,8 +65,8 @@ return 1;
 	{
     printf("p_type:    %d\n", phdr[i].p_type);
     printf("p_offset:  %lx\n", phdr[i].p_offset);
-    printf("p_vaddr:   %lx\n", phdr[i].p_vaddr);
-      switch(phdr[i].p_type){
+    printf("p_vaddr:   0x%lx\n", phdr[i].p_vaddr);
+    switch(phdr[i].p_type){
         case PT_NULL: printf("NULL\n"); break;
         case PT_LOAD: printf("LOAD\n"); break;
         case PT_DYNAMIC: printf("DYNAMIC\n"); break;
@@ -79,5 +82,33 @@ return 1;
     printf("sh_type:   %d\n", shdr[i].sh_type);
     printf("sh_addr:   %lx\n", shdr[i].sh_addr);
 	}
+
+
+
+    printf("========Symbols========\n");
+
+   
+	     //( symboltable & strtab read printf)and( symbol name & address)
+     for(int i=0; i<ehdr.e_shnum;i++)
+        {
+
+         if(shdr[i].sh_type==SHT_SYMTAB)
+         {
+
+            fseek(fp,shdr[i].sh_offset,SEEK_SET);
+            Elf64_Sym *sym=malloc(shdr[i].sh_size);
+            symtable_entry_num=shdr[i].sh_size/shdr[i].sh_entsize;//save symtable_entry num for read and print
+            fread(sym,sizeof(Elf64_Sym),symtable_entry_num,fp);//save symtable to sym
+            fseek(fp,shdr[shdr[i].sh_link].sh_offset,SEEK_SET);//fseek to offset of strtab section header
+            char *strtab=malloc(shdr[shdr[i].sh_link].sh_size);//shdr[shdr[i].sh_link] is section header of strtab
+            fread(strtab,sizeof(char),shdr[shdr[i].sh_link].sh_size,fp);//fread char* strtab size
+           for(int j=0; j<symtable_entry_num;j++)
+	    printf("%s 0x%lx\n",&strtab[sym[j].st_name],sym[j].st_value);//printf
+								       
+         }
+        }
+
+
+
 }
 
