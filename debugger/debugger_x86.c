@@ -30,34 +30,46 @@ typedef struct list{
 }
 
 
-void break_cmd(char *address,pid_t pid){
+*bp_list break_cmd(char *address,pid_t pid,*bp_list head){
 	
+
 	unsigned long addr = strtout(address,NULL,0);//transfer string to addresss
 	bp_list *p=malloc(sizeof(bp_list));
 	p->address=addr
 	p->bu_instr=ptrace(PTRACE_SEEKDATA,pid,addr,NULL);
-	ptrace(PTRACE_POKEDATA,pid,addr,int3);//insert intel x86 stop instruction
-	ptrace(PTRACE_POKEDATA,pid,addr,p->bu_instr);//to recover original instruction 
-	ptr//RIP must be minus one  because int3 trigger RIP plus one for excuting next instruction so we need to decrease   
 	p->active=1;
-	p->next=NULL;
-	ptrace(PTRACE_POKEDATA,pid,
-		//print total number of breakpoint and current breakpoint addres
+        p->next=NULL;
+	ptrace(PTRACE_POKEDATA,pid,addr,int3);//insert intel x86 stop instruction
+	struct user_regs_struct regs;
+	ptrace(PTRACE_GETREGS,pid,NULL,&regs);
+	regs.rip-=1;
+	ptrace(PTRACE_SETREGS,pid,NULL,&regs);//rip must be minus one  because int3 trigger RIP plus one for excuting next instruction so we need to decrease
+	return p;//return bp_list head 
+
+	
 }
 
 void run_cmd(char *address,pid_t pid){
-	
+	ptrace	
 }
 void cont_cmd(char *address,pid_t pid){
+	
+	ptrace(PTRACE_POKEDATA,pid,
 	ptrace(PTRACE_CONT,pid,NULL,NULL);
+	
+ 
 }
 
 void info_cmd(char string[],pid_t pid){
+
+	struct user_regs_struct regs;
 	if(strcmp("breakpoint",string)==0){
-		
-	}
+			}
 	else if(strcmp(""))
 	{}
+
+	//print total number of breakpoint and current breakpoint addres
+
 }
 
 
@@ -105,7 +117,7 @@ int main(int argc,char *argv[]){
 			     int n = sizeof(table)/sizeof(table[0]);
 			     for(int i=0;i<n; i++){
 				     if(strcmp(cmd,table[i].name)==0){
-					     table[i].handler(arg,pid);
+					     table[i].handler(arg,pid,head);//parameter bp_list head
 					     break;
 				     }
 
