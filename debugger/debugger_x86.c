@@ -134,7 +134,7 @@ void info_cmd(char *arg,pid_t pid,*bp_list head)
 
 void all_info_cmd(char *arg,pid_t pid,*bp_list head)
 {
-	info_registers(NULL,pid,head);///I will try next time
+	info_registers(NULL,pid,head);
 	info_breakpoints(NULL,pid,head);
 	info_maps(NULL,pid,head);
 	info_stack(NULL,pid,head);
@@ -142,7 +142,22 @@ void all_info_cmd(char *arg,pid_t pid,*bp_list head)
 
 	}
 
-void info_registers{
+void info_registers(char *arg,pid_t pid,*bp_list head){
+	struct user_regs_struct regs;
+	ptrace(PTRACE_GETREGS,pid,NULL,&regs);
+	printf("=======================registers======================\n");
+	printf("%-5s %016lx\n","RAX",regs.rax);
+	printf("%-5s %016lx\n","RBX",regs.rbx);
+	printf("%-5s %016lx\n","RCX",regs.rcx);
+	printf("%-5s %016lx\n","RDX",regs.rdx);
+	printf("%-5s %016lx\n","RSI",regs.rsi);
+	printf("%-5s %016lx\n","RDI",regs.rdi);
+	printf("%-5s %016lx\n","RBP",regs.rbp);
+	printf("%-5s %016lx\n","RSP",regs.rsp);
+	printf("%-5s %016lx\n","RIP",regs.rip);
+	printf("%-5s %016lx\n","ELF",regs.eflags);
+	printf("======================================================\n");
+
 
 }
 
