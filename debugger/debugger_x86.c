@@ -8,7 +8,7 @@
 #include<stint.h>//for address
 #include<stdbool.h>//for bool
 #include<stdlib.h>//for 0x
-
+#include<captone/capstone.h>//disassemble lib
 
 typedef  struct{
 	char *name
@@ -94,28 +94,29 @@ void run_cmd(char *arg,pid_t pid,*bp_list head){//fork,traceme,exec,breakpoint a
  
 }
 
-
+*bp_list stepi(char arg,pid_t pid, *bp_list head){
+	
 
 
 command_t table[]={
         {"run",run_cmd},//run command -fin
         {"continue",cont_cmd},//cont command-fin
-        {"nexti",nexti_cmd},
-        {"stepi",stepi_cmd},
-        {"finish",fin_cmd},//finish current function and go to caller---------------try*
+        {"nexti",nexti_cmd},//I will do after p project
+        {"stepi",stepi_cmd},//**********current********<- I must read capstone api and tutorial
+        {"finish",fin_cmd},//finish current function and go to caller---------------after p project
         {"entry",ent_cmd},
-        {"staff",staff_cmd},//
-        {"break",break_cmd},
-        {"info",info_cmd}//print info-------------- try*(Current step)
+        {"staff",staff_cmd},//I
+        {"break",break_cmd},//appoint the breakpoint-fin
+        {"info",info_cmd}//print info -fin                  but I will develop more function after p project
 }//command table
 
 command_t info_table[]={//for providing a varity of info command
 
-	{"registers",info_registers}
-	{"breakpoints",info_breakpoints}
-	{"maps",info_maps}
-	{"stack",info_stack}
-	{"info proc",info_signals}
+	{"registers",info_registers}//-fin
+	{"breakpoints",info_breakpoints}//-fin
+	{"maps",info_maps}//after p project
+	{"stack",info_stack}//after p project
+	{"info proc",info_signals}//after p project
 	 
 	 }
 
@@ -161,16 +162,33 @@ void info_registers(char *arg,pid_t pid,*bp_list head){
 
 }
 
-void info_breakpoints{
+void info_breakpoints(char *arg,pid_t pid,*bp_list head){//print bp_num,type,enable,address
+	int count=0;//count the breakpoint num
+	*bp_list tmp=head;
+	  printf("%-12s %-10s %-8s %-s\n",breakpoint,type,enable,address);// print first 
+	
+	while(tmp!=NULL)
+	{	
+
+		printf("%-12d %-10s %-8s 0x%016lx\n",count,"software",tmp->active ? "true" : "false",tmp->address);
+		count++;
+		tmp=tmp->next;
+	}
+
+	if(count==0){
+		printf("breakpoint not exist!!");
+	}
+
 }
 
-void info_maps{
+void info_maps{//after p project
+
 }
 
-void info_stack{
+void info_stack{//after p project
 }
 
-void info_signals{
+void info_signals{//after p project
 }
 
 
