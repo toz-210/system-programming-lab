@@ -1,5 +1,5 @@
 #include<stdio.h>
-#include<intypes,h>
+#include<inttypes.h>
 
 #include<capstone/capstone.h>
 
@@ -17,7 +17,10 @@ int main(void){
 
 	printf("0x%"PRIx64":%s\t%s",insn[0].address,insn[0].mnemonic,insn[0].op_str);
 
-	cs_free(insn, count)
+	cs_free(insn, count);
+
+	return 0;
+}
 
 
 	
